@@ -6,13 +6,14 @@
   "scripts": {
     "start": "rocketact-scripts start",
     "build": "rocketact-scripts build",
-    "lint": "eslint 'src/**/*.{js,ts,tsx}' --quiet --fix"
+    "lint": "eslint 'src/**/*.{js,ts,tsx}' --quiet --fix",
+    "commit": "git-cz"
   },
   "repository": {
     "type": "git",
     "url": "git repo url"
   },
-  "author": "author <author@rocketact.com>",
+  "author": "Daisy-Li <804607269@qq.com>",
   "license": "ISC",
   "browserslist": [
     "> 0.5%",

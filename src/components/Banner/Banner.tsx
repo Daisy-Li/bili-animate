@@ -111,19 +111,27 @@ class Banner extends React.PureComponent<any,any> {
     // 不延时获取宽高不准确
     setTimeout(() => {
       this.resize()
+      if(this.state.images.bg) {
+        this.draw(this.state.images.bg, config.bg,this.state.canvasList.bg)
+      }
+      if(this.state.images.girl) {
+        this.draw(this.state.images.girl, config.girl,this.state.canvasList.girl)
+      }
+      if(this.state.images.land) {
+        this.draw(this.state.images.land, config.land,this.state.canvasList.land)
+      }
+      if(this.state.images.ground) {
+        this.draw(this.state.images.ground, config.ground,this.state.canvasList.ground)
+      }
+      if(this.state.images.littleGirl) {
+        this.draw(this.state.images.littleGirl, config.littleGirl,this.state.canvasList.littleGirl)
+      }
+      if(this.state.images.grass) {
+        this.draw(this.state.images.grass, config.grass,this.state.canvasList.grass)
+      }
     }, 100);
     setTimeout(this.wink, 4800)
     
-    // const bg = this.bg.current;
-    // if(bg.getContext) {
-    //   const ctx = bg.getContext("2d")
-    //   const img = new Image()
-    //   img.src = bgImage;
-    //   console.log(bg.width)
-    //   setTimeout(() => {
-    //     ctx.drawImage(img,100,0,2700,250,0,0,bg.width,bg.height);
-    //   },1000)
-    // }
   }
 
   public render() {
