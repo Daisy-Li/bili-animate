@@ -4,13 +4,13 @@ import "./index.scss";
 
 import bannerImage from '../../styles/i/full-bg.png'
 import bgImage from '../../styles/i/bg.png'
-import girl from '../../styles/i/22-open-eye.png'
-import girlCloseEye from '../../styles/i/22-close-eye.png'
-import girlClosingEye from '../../styles/i/22-closing-eye.png'
-import girlOpeningEye from '../../styles/i/22-opening-eye.png'
+import girl from '../../styles/i/girl-open-eye.png'
+import girlCloseEye from '../../styles/i/girl-close-eye.png'
+import girlClosingEye from '../../styles/i/girl-closing-eye.png'
+import girlOpeningEye from '../../styles/i/girl-opening-eye.png'
 import land from '../../styles/i/land.png'
 import ground from '../../styles/i/ground.png'
-import littleGirl from '../../styles/i/33.png'
+import littleGirl from '../../styles/i/littlegirl.png'
 import grass from '../../styles/i/grass.png'
 
 const config = {
@@ -86,6 +86,79 @@ class Banner extends React.PureComponent<any,any> {
     this.state.images.girl && this.draw(this.state.images.girl, config.girl,this.state.canvasList.girl)
     setTimeout(this.wink, 4800)
   }
+  
+  renderCanvas = (ratio : number) => {
+    if (ratio < 0 && this.state.images.bg) {
+      let c = { ...config.bg }
+      c.blur = c.blur + ratio * c.blur
+      this.draw(this.state.images.bg, c, this.state.canvasList.bg)
+    }
+
+    if (this.state.images.girl) {
+      let c = config.girl
+      c.blur = Math.abs(ratio * 10)
+      c.sx = 150 - ratio * 10
+      this.draw(this.state.images.girl, c, this.state.canvasList.girl)
+    }
+
+    if (this.state.images.land) {
+      let c = { ...config.land }
+      c.blur = Math.abs(c.blur - ratio * 4)
+      c.sx = (c.sx || 0) - ratio * 30
+      this.draw(this.state.images.land, c, this.state.canvasList.land)
+    }
+
+    if (this.state.images.ground) {
+      let c = { ...config.ground }
+      c.blur = Math.abs(c.blur - ratio * 8)
+      c.sx = (c.sx || 0) - ratio * 40
+      this.draw(this.state.images.ground, c, this.state.canvasList.ground)
+    }
+
+    if (this.state.images.littleGirl) {
+      let c = { ...config.littleGirl }
+      c.blur = Math.abs(c.blur - ratio * 8)
+      c.sx = (c.sx || 0) - ratio * 90
+      this.draw(this.state.images.littleGirl, c, this.state.canvasList.littleGirl)
+    }
+
+    if (this.state.images.grass) {
+      let c = { ...config.grass }
+      c.blur = Math.abs(c.blur - ratio * 6)
+      c.sx = (c.sx || 0) - ratio * 110
+      this.draw(this.state.images.grass, c, this.state.canvasList.grass)
+    }
+  }
+  tick = (ratio : number, gap : number) => {
+    if (gap * ratio < 0) {
+      ratio = ratio + gap
+      this.renderCanvas(ratio)
+      requestAnimationFrame(() => this.tick(ratio,gap))
+    } else {
+      if(this.state.images.bg) {
+        this.draw(this.state.images.bg, config.bg,this.state.canvasList.bg)
+      }
+
+      if(this.state.images.girl) {
+        config.girl.blur = 0
+        config.girl.sx = 150
+        this.draw(this.state.images.girl, config.girl,this.state.canvasList.girl)
+      }
+
+      if(this.state.images.land) {
+        this.draw(this.state.images.land, config.land,this.state.canvasList.land)
+      }
+      if(this.state.images.ground) {
+        this.draw(this.state.images.ground, config.ground,this.state.canvasList.ground)
+      }
+      if(this.state.images.littleGirl) {
+        this.draw(this.state.images.littleGirl, config.littleGirl,this.state.canvasList.littleGirl)
+      }
+      if(this.state.images.grass) {
+        this.draw(this.state.images.grass, config.grass,this.state.canvasList.grass)
+      }
+    }
+  }
   componentWillMount() {
     let imagesSrc = {
       bg: bgImage,
@@ -109,6 +182,16 @@ class Banner extends React.PureComponent<any,any> {
   }
   componentDidMount() {
     // 不延时获取宽高不准确
+
+    window.addEventListener('resize', () => {
+      this.resize()
+      this.state.images.bg && this.draw(this.state.images.bg, config.bg,this.state.canvasList.bg)
+      this.state.images.girl && this.draw(this.state.images.girl, config.girl,this.state.canvasList.girl)
+      this.state.images.land && this.draw(this.state.images.land, config.land,this.state.canvasList.land)
+      this.state.images.ground && this.draw(this.state.images.ground, config.ground,this.state.canvasList.ground)
+      this.state.images.littleGirl && this.draw(this.state.images.littleGirl, config.littleGirl,this.state.canvasList.littleGirl)
+      this.state.images.grass && this.draw(this.state.images.grass, config.grass,this.state.canvasList.grass)
+    })
     setTimeout(() => {
       this.resize()
       if(this.state.images.bg) {
@@ -131,7 +214,25 @@ class Banner extends React.PureComponent<any,any> {
       }
     }, 100);
     setTimeout(this.wink, 4800)
-    
+
+    let enterPoint = {}
+    this.fullBox.current.addEventListener('mouseenter', (e: { clientX: number; }) => {
+      const { width } = this.fullBox.current.getBoundingClientRect()
+      enterPoint.x = e.clientX
+      enterPoint.w = width
+    })
+    this.fullBox.current.addEventListener('mousemove', (e: { clientX: number; }) => {
+      const v = e.clientX - enterPoint.x
+      const ratio = v / enterPoint.w
+      requestAnimationFrame(() => this.renderCanvas(ratio))
+    })
+    this.fullBox.current.addEventListener('mouseout', (e: { clientX: number; }) => {
+      const v = e.clientX - enterPoint.x
+      let ratio = v / enterPoint.w
+      const gap = 0.08 * (ratio < 0 ? 1 : -1)
+  
+      requestAnimationFrame(() => this.tick(ratio,gap))
+    })
   }
 
   public render() {
